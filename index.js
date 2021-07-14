@@ -39,16 +39,6 @@ Dates.map((date)=>{
 		masterData.push({"effective_date":date,"country_id":5,"createdAt":new Date(),"updatedAt":new Date()})
 	 })
 
-// let convData=[];
-//  data.filter((hero) =>{
-// 	 let index = [];
-// 	 index.push(hero.Date.toISOString().split('T')[0])
-// 	 index.map((date)=>{	
-// 		convData.push({"effective_date":date,"em_country_id":5,"unit":1,"to_curr":countryDetails[ExRateCountryId].code,"createdAt":new Date(),"updatedAt":new Date()})
-// 	 })
-// 	 console.log(index)
-	
-// });
 
 app.post("/", async (req, res) => {
 	try {
