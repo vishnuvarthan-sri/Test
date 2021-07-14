@@ -167,19 +167,7 @@ exports.insert_exchange_rates = async (
   };
   //
 
-  //master
-  exports.insert_currency_conversion = async (masterData) => {
-    await models.Master
-      .bulkCreate(masterData)
-      .then(async (body) => {
-        console.log("Success");
-      })
-      .catch((err) => {
-        console.log("Error", err);
-      });
-    
-  };
-  //
+
 
 
   const insert_currency = async (
