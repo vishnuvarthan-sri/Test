@@ -1,8 +1,9 @@
   
-const sequelize = require('./index.js');
-const Sequelize = require("sequelize");
 
-    var master = sequelize.define('em_currency_conversion_master', {
+
+module.exports=(sequelize,Sequelize)=>{
+
+    const master = sequelize.define('em_currency_conversion_master', {
       'id': {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -35,5 +36,5 @@ const Sequelize = require("sequelize");
     }, {
       tableName: 'em_currency_conversion_master'
     });
-
-    module.exports = master;
+    return master
+  }

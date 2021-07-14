@@ -1,8 +1,6 @@
-
-  const sequelize = require('./index.js');
-  const Sequelize = require("sequelize");
   
-  var conv = sequelize.define('em_currency_conversion', {
+  module.exports =(sequelize,Sequelize)=>{
+  const conv = sequelize.define('em_currency_conversion', {
       'id': {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -31,7 +29,7 @@
         comment: "null"
       },
       'exchange_rate': {
-        type:Sequelize. DOUBLE,
+        type:Sequelize.DOUBLE,
         allowNull: false,
         comment: "null"
       },
@@ -58,5 +56,5 @@
     }, {
       tableName: 'em_currency_conversion'
     });
-
-    module.exports = conv;
+    return conv
+  }

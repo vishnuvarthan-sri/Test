@@ -21,5 +21,13 @@ sequelize
     console.error("Unable to connect to the database:", err);
   });
 
-module.exports = sequelize;
+  const db = {};
+
+  db.Sequelize = Sequelize;
+  db.sequelize = sequelize;
+  
+  db.Master = require("./emtaxMaster")(sequelize, Sequelize);
+  db.conv = require("./emtaxConv")(sequelize, Sequelize);
+  
+  module.exports = db;
 
