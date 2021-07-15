@@ -3,6 +3,7 @@ var app = express();
 const db = require('./models');
 var users = require('./users/master.js');
 const _ = require('lodash');
+const { map } = require("lodash");
 
 db.sequelize.sync()
 db.sequelize.sync({force:true})
@@ -42,8 +43,10 @@ Dates.map((date)=>{
 
 app.post("/", async (req, res) => {
 	try {
-	  let result = await users.insert_currency_master(masterData)
-	  res.status(200).send(result);
+		await Dates.map((date)=>{
+		 users.insert_currency_master(date,5)
+		})
+	  res.status(200);
 	} catch (error) {
 	  res.status(error.statusCode || 400).send(error);
 	}
@@ -51,15 +54,17 @@ app.post("/", async (req, res) => {
 
 app.post("/conv",async(req,res)=>{
 	try {
-		let result = await users.insert_currency_conversion(masterData)
-		res.status(200).send(result);
+       await Dates.map((date)=>{
+		users.insert_exchange_rates(date,5,countryDetails[ExRateCountryId].code,master)
+	   })
+		res.status(200);
 	  } catch (error) {
 		res.status(error.statusCode || 400).send(error);
 	  }
 })
 
 app.get('/data',(req,res)=>{
-res.send(data)
+res.send(master)
 })
 
 

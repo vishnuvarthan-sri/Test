@@ -3,97 +3,67 @@
 // var conv = require('./models/emtaxConv.js');
 const models = require('../models')
 const Sequelize = require("sequelize");
+const { raw } = require('express');
 
 
 
 exports.insert_exchange_rates = async (
     effective_date,
     country_id,
+    to_curr,
     uae_ex_rates,
     req,
     res
   ) => {
-    let currency_array = [];
-    effective_date = await getdate(effective_date);
-    await uae_ex_rates.forEach((value, index) => {
-      let currency_obj = {};
-      if (!isNaN(parseFloat(value["Currency"]))) {
-        console.log("effective_date", effective_date);
-        currency_obj["effective_date"] = effective_date;
-        currency_obj["unit"] = 1;
-        if (counrty_map_array[value["Country"]]) {
-          currency_obj["from_curr"] = counrty_map_array[value["Country"]];
-        } else {
-          currency_obj["from_curr"] = value["Country"];
-        }
-        currency_obj["to_curr"] = countryDetails[ExRateCountryId].code;
-        currency_obj["em_country_id"] = country_id;
-        currency_obj["exchange_rate"] = parseFloat(value["Currency"]);
-        currency_obj["createdAt"] = new Date();
-        currency_obj["updatedAt"] = new Date();
-        currency_array.push(currency_obj);
-      }
-    });
-    if (currency_array.length > 0) {
-      currency_array.push({
-        effective_date,
-        unit: 1,
-        from_curr: countryDetails[ExRateCountryId].code,
-        to_curr: countryDetails[ExRateCountryId].code,
-        exchange_rate: 1,
-        em_country_id: country_id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-    }
-    if (currency_array.length > 0) {
-      await models.em_currency_conversion_master
-        .findAll({
-          attributes: ["id"],
-          where: {
-            effective_date,
-            country_id,
-          },
-        })
-        .then(async (body) => {
-          if (body.length > 0) {
-            await delete_currency_master(
-              effective_date,
-              country_id,
-              currency_array,
-              req,
-              res
-            );
-          } else {
-            if (currency_array.length > 0) {
-              await insert_currency_master(
-                effective_date,
-                country_id,
-                uae_ex_rates,
-                req,
-                res
-              );
-            } else {
-              console.log("Invalid effective date");
-            }
-          }
-        })
-        .catch((err) => {
-          console.log("Error", err);
-          FxRateAutoUpdater(req, res);
-        });
-    } else {
-      console.log("No Rows Found to Insert Exchange Rates");
-    }
+     await models.Master
+     .findAll({
+        where: {
+            effective_date
+        },
+        raw:true
+     })
+      .then(async(data)=>{   
+          await data.map(async(data1)=>{
+              await uae_ex_rates.map(async(element,index)=>{
+                  if(element.Date == data1.effective_date){
+                    await models.conv
+                                     .create({
+                                        effective_date:element.Date,
+                                        unit:1,
+                                        from_curr:element.__EMPTY,
+                                        to_curr:to_curr,
+                                        exchange_rate:element.Rate,
+                                        createdAt:new Date(),
+                                        updatedAt:new Date(),
+                                        em_country_id:country_id,
+                                        master_id:data1.id
+                                     })
+                                     .then(async (body) => {
+                                        console.log("Success conv");
+                                      })
+                                      .catch((err) => {
+                                        console.log("Error", err);
+                                      });
+
+                  }
+              })      
+          })
+      })
+      .catch((err)=>{
+          res.status(400).send(err)
+      })
   };
 
 
- 
 
-  //master
-  exports.insert_currency_master = async (masterData) => {
+  exports.insert_currency_master = async (effective_date,country_id) => {
     await models.Master
-      .bulkCreate(masterData,{ignoreDuplicates:true})
+      .create({
+          effective_date,
+          country_id,
+          createdAt:new Date(),
+          updatedAt:new Date()
+      })
       .then(async (body) => {
         console.log("Success");
       })
